@@ -31,7 +31,7 @@ START:
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	mov	si, 0		; SI 레지스터(문자열 원본 인덱스 레지스터)를 초기화
 
-.SCREENCLEARLOOP					; 화면을 지우는 루프
+.SCREENCLEARLOOP:					; 화면을 지우는 루프
 	mov byte [ es: si ], 0			; 비디오 메모리의 문자가 위치하는 어드레스에
 									; 0을 복사하여 문자를 삭제
 	mov byte [ es: si + 1 ], 0x0A	; 비디오 메모리의 속성이 위치하는 어드레스에
@@ -168,7 +168,7 @@ HANDLEDISKERROR:
 
 ; 메시지를 출력하는 함수
 ;	PARAM: x 좌표, y 좌표, 문자열
-PRINTMESSAGE
+PRINTMESSAGE:
 	push bp		; 베이스 포인터 레지스터(BP)를 스택에 삽입
 	mov bp, sp	; 베이스 포인터 레지스터(BP)에 스택 포인터 레지스터(SP)의 값을 설정
 				; 베이스 포인터 레지스터(BP)를 이용해서 파라미터에 접근할 목적
@@ -222,7 +222,7 @@ PRINTMESSAGE
 									; 2를 더해야 함
 
 	jmp .MESSAGELOOP				; 메시지 출력 루프로 이동하여 다음 문자를 출력
-.MESSAGEEND
+.MESSAGEEND:
 	pop dx		; 함수에서 사용이 끝난 DX 레지스터부터 ES 레지스터까지를 스택에
 	pop cx		; 삽입된 값을 이용해서 복원
 	pop ax		; 스택은 가장 마지막에 들어간 데이터가 가장 먼저 나오는
