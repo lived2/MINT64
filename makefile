@@ -22,12 +22,14 @@ Kernel32:
 	@echo ================= Build Complete ================= 
 	@echo
 
-Disk.img: 00.BootLoader/BootLoader.bin 01.Kernel32/Kernel32.bin
+#Disk.img: 00.BootLoader/BootLoader.bin 01.Kernel32/Kernel32.bin
+Disk.img: BootLoader Kernel32
 	@echo
 	@echo ================= Disk.img Build Start ================= 
 	@echo
 
-	cat $^ > Disk.img
+	#cat $^ > Disk.img
+	cat 00.BootLoader/BootLoader.bin 01.Kernel32/Kernel32.bin > Disk.img
 
 	@echo
 	@echo ================= All Build Complete ================= 
@@ -38,5 +40,5 @@ clean:
 	make -C 01.Kernel32 clean
 	rm -f Disk.img
 
-run:
+run: Disk.img
 	qemu-system-x86_64.exe -m 64 -fda ./Disk.img -localtime -M pc
