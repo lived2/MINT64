@@ -1,23 +1,26 @@
 #include "Types.h"
 
-void kPrintString(int iX, int iY, const char* pcString);
+void kPrintString(int iX, int iY, const char* pcString, BOOL attr);
+DWORD strlen(const char* vcString);
 BOOL kInitializeKernel64Area(void);
 
 // Main 함수
 void Main(void)
 {
 	DWORD i;
+	const char* vcCKernelStartMsg = "C Language Kernel Started......................[    ]";
 
-	kPrintString(0, 3, "C Language Kernel Started~!!!");
+	kPrintString(0, 3, vcCKernelStartMsg, WHITE);
+	kPrintString(strlen(vcCKernelStartMsg)-5, 3, "Pass", BOLD|GREEN);
 
 	// IA-32e 모드의 커널 영역을 초기화
 	kInitializeKernel64Area();
-	kPrintString(0, 4, "IA-32e Kernel Area Initialization Complete");
+	kPrintString(0, 4, "IA-32e Kernel Area Initialization Complete", WHITE);
 
 	while (1);
 }
 
-void kPrintString(int iX, int iY, const char* pcString)
+void kPrintString(int iX, int iY, const char* pcString, BOOL attr)
 {
 	CHARACTER* pstScreen = (CHARACTER*)0xB8000;
 	int i;
@@ -25,7 +28,16 @@ void kPrintString(int iX, int iY, const char* pcString)
 	pstScreen += (iY*80) + iX;
 	for (i = 0; pcString[i] != 0; i++) {
 		pstScreen[i].bCharactor = pcString[i];
+		pstScreen[i].bAttribute = attr;
 	}
+}
+
+DWORD strlen(const char* vcString)
+{
+	DWORD dwLen = 0;
+	while (vcString[dwLen] != 0)
+		dwLen++;
+	return dwLen;
 }
 
 // IA-32e 모드용 커널 영역을 0으로 초기화
