@@ -1,4 +1,4 @@
-all: BootLoader Kernel32 Disk.img
+all: BootLoader Kernel32 ImageMaker Disk.img
 
 BootLoader:
 	@echo
