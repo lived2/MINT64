@@ -34,13 +34,12 @@ ImageMaker: 04.Utility/00.ImageMaker/ImageMaker.c
 	@echo ================= Build Complete ================= 
 	@echo
 
-#Disk.img: 00.BootLoader/BootLoader.bin 01.Kernel32/Kernel32.bin
-Disk.img: BootLoader Kernel32 ImageMaker
+Disk.img: 00.BootLoader/BootLoader.bin 01.Kernel32/Kernel32.bin
 	@echo
 	@echo ================= Disk.img Build Start ================= 
 	@echo
 
-	./ImageMaker.exe 00.BootLoader/BootLoader.bin 01.Kernel32/Kernel32.bin
+	./ImageMaker.exe $^
 
 	@echo
 	@echo ================= All Build Complete ================= 
