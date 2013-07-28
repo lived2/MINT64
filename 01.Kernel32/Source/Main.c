@@ -12,6 +12,7 @@ void Main(void)
 	const char* vcCKernelStartMsg = 	"C Language Kernel Started......................[    ]";
 	const char* vcMinMemMsg =       	"Minimum Memory Size Check......................[    ]";
 	const char* vcInit64KernelArea =	"IA-32e Kernel Area Initialize..................[    ]";
+	const char* vcPageTableInitMsg =	"IA-32e Page Tables Initialize..................[    ]";
 
 	kPrintString(0, 3, vcCKernelStartMsg, WHITE);
 	kPrintString(strlen(vcCKernelStartMsg)-5, 3, "Pass", BOLD|GREEN);
@@ -35,6 +36,11 @@ void Main(void)
 		while (1);
 	}
 	kPrintString(strlen(vcInit64KernelArea)-5, 5, "Pass", BOLD|GREEN);
+
+	// IA-32e 모드 커널을 위한 페이지 테이블 생성
+	kPrintString(0, 6, vcPageTableInitMsg, WHITE);
+	kInitializePageTables();
+	kPrintString(strlen(vcPageTableInitMsg)-5, 6, "Pass", BOLD|GREEN);
 
 	while (1);
 }
