@@ -4,6 +4,7 @@ void kPrintString(int iX, int iY, const char* pcString, BOOL attr);
 DWORD strlen(const char* vcString);
 BOOL kInitializeKernel64Area(void);
 BOOL kIsMemoryEnough(void);
+void kReadCPUID(DWORD dwEAX, DWORD* pdwEAX, DWORD* pdwEBX, DWORD* pdwECX, DWORD* pdwEDX);
 
 // Main 함수
 void Main(void)
@@ -11,36 +12,66 @@ void Main(void)
 	DWORD i;
 	const char* vcCKernelStartMsg = 	"C Language Kernel Started......................[    ]";
 	const char* vcMinMemMsg =       	"Minimum Memory Size Check......................[    ]";
+	const char* vcSupportIA32eMsg =		"IA-32e Mode Support Check......................[    ]";
 	const char* vcInit64KernelArea =	"IA-32e Kernel Area Initialize..................[    ]";
 	const char* vcPageTableInitMsg =	"IA-32e Page Tables Initialize..................[    ]";
+	const char* vcCPUVendorIs =			"CPU Vendor: ";
+	DWORD dwEAX, dwEBX, dwECX, dwEDX;
+	char* vcVendorString[13] = {0, };
+	DWORD cnt = 3;
 
-	kPrintString(0, 3, vcCKernelStartMsg, WHITE);
-	kPrintString(strlen(vcCKernelStartMsg)-5, 3, "Pass", BOLD|GREEN);
+	kPrintString(0, cnt, vcCKernelStartMsg, WHITE);
+	kPrintString(strlen(vcCKernelStartMsg)-5, cnt, "Pass", BOLD|GREEN);
+	cnt++;
 
 	// 최소 메모리 크기를 만족하는지 검사
-	kPrintString(0, 4, vcMinMemMsg, WHITE);
+	kPrintString(0, cnt, vcMinMemMsg, WHITE);
 	if (kIsMemoryEnough() == FALSE) {
-		kPrintString(strlen(vcMinMemMsg)-5, 4, "Fail", BOLD|RED);
-		kPrintString(0, 5, "Not Enough Memory~!! MINT64 OS Requires Over "
+		kPrintString(strlen(vcMinMemMsg)-5, cnt+1, "Fail", BOLD|RED);
+		kPrintString(0, cnt+1, "Not Enough Memory~!! MINT64 OS Requires Over "
 				"64Mbyte Memory~!!", BOLD|RED);
 		while (1);
 	} else {
-		kPrintString(strlen(vcMinMemMsg)-5, 4, "Pass", BOLD|GREEN);
+		kPrintString(strlen(vcMinMemMsg)-5, cnt, "Pass", BOLD|GREEN);
 	}
+	cnt++;
 
-	// IA-32e 모드의 커널 영역을 초기화
-	kPrintString(0, 5, vcInit64KernelArea, WHITE);
-	if (kInitializeKernel64Area() == FALSE) {
-		kPrintString(strlen(vcInit64KernelArea)-5, 5, "Fail", BOLD|RED);
-		kPrintString(0, 6, "Kernel Area Initialization Fail~!!", BOLD|RED);
+	// 프로세서 제조사 정보 읽기
+	kReadCPUID(0x00, &dwEAX, &dwEBX, &dwECX, &dwEDX);
+	*(DWORD*)vcVendorString = dwEBX;
+	*((DWORD*)vcVendorString+1) = dwEDX;
+	*((DWORD*)vcVendorString+2) = dwECX;
+	kPrintString(0, cnt, vcCPUVendorIs, WHITE);
+	kPrintString(strlen(vcCPUVendorIs), cnt, vcVendorString, BOLD|RED);
+	cnt++;
+
+	// CPU의 IA-32 모드 지원 여부 체크
+	kReadCPUID(0x80000001, &dwEAX, &dwEBX, &dwECX, &dwEDX);
+	kPrintString(0, cnt, vcSupportIA32eMsg, WHITE);
+	if (dwEDX & (1 << 29)) {
+		kPrintString(strlen(vcSupportIA32eMsg)-5, cnt, "Pass", BOLD|GREEN);
+	} else {
+		kPrintString(strlen(vcSupportIA32eMsg)-5, cnt, "Fail", BOLD|RED);
+		kPrintString(0, cnt+1, "CPU must support IA-32e(64bit) mode ", BOLD|RED);
 		while (1);
 	}
-	kPrintString(strlen(vcInit64KernelArea)-5, 5, "Pass", BOLD|GREEN);
+	cnt++;
+
+	// IA-32e 모드의 커널 영역을 초기화
+	kPrintString(0, cnt, vcInit64KernelArea, WHITE);
+	if (kInitializeKernel64Area() == FALSE) {
+		kPrintString(strlen(vcInit64KernelArea)-5, cnt+1, "Fail", BOLD|RED);
+		kPrintString(0, cnt+1, "Kernel Area Initialization Fail~!!", BOLD|RED);
+		while (1);
+	}
+	kPrintString(strlen(vcInit64KernelArea)-5, cnt, "Pass", BOLD|GREEN);
+	cnt++;
 
 	// IA-32e 모드 커널을 위한 페이지 테이블 생성
-	kPrintString(0, 6, vcPageTableInitMsg, WHITE);
+	kPrintString(0, cnt, vcPageTableInitMsg, WHITE);
 	kInitializePageTables();
-	kPrintString(strlen(vcPageTableInitMsg)-5, 6, "Pass", BOLD|GREEN);
+	kPrintString(strlen(vcPageTableInitMsg)-5, cnt, "Pass", BOLD|GREEN);
+	cnt++;
 
 	while (1);
 }
