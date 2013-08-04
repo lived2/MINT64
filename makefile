@@ -1,4 +1,4 @@
-all: BootLoader Kernel32 ImageMaker Disk.img
+all: BootLoader Kernel32 Kernel64 Utility Disk.img
 
 BootLoader:
 	@echo
@@ -22,19 +22,18 @@ Kernel32:
 	@echo ================= Build Complete ================= 
 	@echo
 
-ImageMaker: 04.Utility/00.ImageMaker/ImageMaker.c
+Kernel64:
 	@echo
-	@echo ================= Build ImageMaker ================= 
+	@echo ================= Build 64bit Kernel ================= 
 	@echo
 
-	make -C 04.Utility/00.ImageMaker
-	cp 04.Utility/00.ImageMaker/ImageMaker.exe .
+	make -C 02.Kernel64
 
 	@echo
 	@echo ================= Build Complete ================= 
 	@echo
 
-Disk.img: 00.BootLoader/BootLoader.bin 01.Kernel32/Kernel32.bin
+Disk.img: 00.BootLoader/BootLoader.bin 01.Kernel32/Kernel32.bin 02.Kernel64/Kernel64.bin
 	@echo
 	@echo ================= Disk.img Build Start ================= 
 	@echo
@@ -45,12 +44,23 @@ Disk.img: 00.BootLoader/BootLoader.bin 01.Kernel32/Kernel32.bin
 	@echo ================= All Build Complete ================= 
 	@echo
 
+Utility:
+	@echo
+	@echo ================= Build ImageMaker ================= 
+	@echo
+
+	make -C 04.Utility
+
+	@echo
+	@echo ================= Build Complete ================= 
+	@echo
+
 clean:
 	make -C 00.BootLoader clean
 	make -C 01.Kernel32 clean
+	make -C 02.Kernel64 clean
+	make -C 04.Utility clean
 	rm -f Disk.img
-	make -C 04.Utility/00.ImageMaker clean
-	rm -f ImageMaker.exe
 
 run: Disk.img
 	qemu-system-x86_64.exe -m 64 -fda ./Disk.img -localtime -M pc

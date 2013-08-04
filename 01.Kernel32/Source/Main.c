@@ -6,17 +6,19 @@ void kPrintString(int iX, int iY, const char* pcString, BOOL attr);
 DWORD strlen(const char* vcString);
 BOOL kInitializeKernel64Area(void);
 BOOL kIsMemoryEnough(void);
+void kCopyKernel64ImageTo2Mbyte(void);
 
 // Main 함수
 void Main(void)
 {
 	//DWORD i;
-	const char* vcCKernelStartMsg = 	"C Language Kernel Started......................[    ]";
+	const char* vcCKernelStartMsg = 	"Protected Mode C Language Kernel Started.......[    ]";
 	const char* vcMinMemMsg =       	"Minimum Memory Size Check......................[    ]";
 	const char* vcSupportIA32eMsg =		"IA-32e Mode Support Check......................[    ]";
 	const char* vcInit64KernelArea =	"IA-32e Kernel Area Initialize..................[    ]";
 	const char* vcPageTableInitMsg =	"IA-32e Page Tables Initialize..................[    ]";
 	const char* vcCPUVendorIs =			"Processor Vendor String........................[";
+	const char* vcCopyIA32eKernel =		"Copy IA-32e Kernel To 2Mbyte Address...........[    ]";
 	DWORD dwEAX, dwEBX, dwECX, dwEDX;
 	char* vcVendorString[13] = {0, };
 	DWORD cnt = 3;
@@ -75,10 +77,16 @@ void Main(void)
 	kPrintString(strlen(vcPageTableInitMsg)-5, cnt, "Pass", BOLD|GREEN);
 	cnt++;
 
+	// IA-32e 모드 커널을 0x200000(2Mbyte) 어드레스로 이동
+	kPrintString(0, cnt, vcCopyIA32eKernel, WHITE);
+	kCopyKernel64ImageTo2Mbyte();
+	kPrintString(strlen(vcCopyIA32eKernel)-5, cnt, "Pass", BOLD|GREEN);
+	cnt++;
+
 	// IA-32e 모드로 전환
 	kPrintString(0, cnt, "Switch To IA-32e Mode", WHITE);
 	// 원래는 아래 함수를 호출해야 하나 IA-32e 모드 커널이 없으므로 주석 처리
-	//kSwitchAndExecute64bitKernel();
+	kSwitchAndExecute64bitKernel();
 
 	while (1);
 }
@@ -149,4 +157,26 @@ BOOL kIsMemoryEnough(void)
 		pdwCurrentAddress += (0x100000/4);
 	}
 	return TRUE;
+}
+
+// IA-32e 모드 커널을 0x200000(2Mbyte) 어드레스에 복사
+void kCopyKernel64ImageTo2Mbyte(void)
+{
+	WORD wKernel32SectorCount, wTotalKernelSectorCount;
+	DWORD* pdwSourceAddress, * pdwDestinationAddress;
+	int i, size;
+
+	// 0x7C05에 총 커널 섹터 수, 0x7C07에 보호 모드 커널 섹터 수가 들어 있음
+	wTotalKernelSectorCount = *((WORD*)0x7C05);
+	wKernel32SectorCount = *((WORD*)0x7C07);
+
+	pdwSourceAddress = (DWORD*)(0x10000 + (wKernel32SectorCount * 512));
+	pdwDestinationAddress = (DWORD*)0x200000;
+	// IA-32e 모드 커널 섹터 크기만큼 복사
+	size = 512 * (wTotalKernelSectorCount - wKernel32SectorCount) / 4;
+	for (i = 0; i < size ; i++) {
+		*pdwDestinationAddress = *pdwSourceAddress;
+		pdwDestinationAddress++;
+		pdwSourceAddress++;
+	}
 }

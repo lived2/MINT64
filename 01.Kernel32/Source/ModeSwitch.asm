@@ -1,5 +1,7 @@
+[BITS 32]               ; 이하의 코드는 32비트 코드로 설정
+
 ; C 언에서 호출할 수 있도록 이름을 노출(Export)
-global kReadCPUID
+global kReadCPUID, kSwitchAndExecute64bitKernel
 
 SECTION .text
 
@@ -67,10 +69,10 @@ kSwitchAndExecute64bitKernel:
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	; IA32_EFER.LME를 1로 설정하여 IA-32e 모드를 활성화
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	mov eax, 0xC0000080	; IA32_EFER MSR 레지스터의 어드레스를 저장
+	mov ecx, 0xC0000080	; IA32_EFER MSR 레지스터의 어드레스를 저장
 	rdmsr				; MSR 레지스터를 읽기
 
-	or eax, 0x100		; EAX 레지스터에 저장된 IA32_EFER MSR의 하위 32비트에서
+	or eax, 0x0100		; EAX 레지스터에 저장된 IA32_EFER MSR의 하위 32비트에서
 						; LME 비트(비트 8)을 1로 설정
 	wrmsr				; MSR 레지스터에 쓰기
 
