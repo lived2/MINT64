@@ -1,10 +1,11 @@
 #include "Types.h"
+#include "Page.h"
+#include "ModeSwitch.h"
 
 void kPrintString(int iX, int iY, const char* pcString, BOOL attr);
 DWORD strlen(const char* vcString);
 BOOL kInitializeKernel64Area(void);
 BOOL kIsMemoryEnough(void);
-void kReadCPUID(DWORD dwEAX, DWORD* pdwEAX, DWORD* pdwEBX, DWORD* pdwECX, DWORD* pdwEDX);
 
 // Main 함수
 void Main(void)
@@ -42,7 +43,7 @@ void Main(void)
 	*((DWORD*)vcVendorString+1) = dwEDX;
 	*((DWORD*)vcVendorString+2) = dwECX;
 	kPrintString(0, cnt, vcCPUVendorIs, WHITE);
-	kPrintString(strlen(vcCPUVendorIs), cnt, vcVendorString, BOLD|RED);
+	kPrintString(strlen(vcCPUVendorIs), cnt, (const char*)vcVendorString, BOLD|RED);
 	cnt++;
 
 	// CPU의 IA-32 모드 지원 여부 체크
@@ -72,6 +73,11 @@ void Main(void)
 	kInitializePageTables();
 	kPrintString(strlen(vcPageTableInitMsg)-5, cnt, "Pass", BOLD|GREEN);
 	cnt++;
+
+	// IA-32e 모드로 전환
+	kPrintString(0, cnt, "Switch To IA-32e Mode", WHITE);
+	// 원래는 아래 함수를 호출해야 하나 IA-32e 모드 커널이 없으므로 주석 처리
+	//kSwitchAndExecute64bitKernel();
 
 	while (1);
 }
