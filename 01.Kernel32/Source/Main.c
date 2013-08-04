@@ -10,13 +10,13 @@ BOOL kIsMemoryEnough(void);
 // Main 함수
 void Main(void)
 {
-	DWORD i;
+	//DWORD i;
 	const char* vcCKernelStartMsg = 	"C Language Kernel Started......................[    ]";
 	const char* vcMinMemMsg =       	"Minimum Memory Size Check......................[    ]";
 	const char* vcSupportIA32eMsg =		"IA-32e Mode Support Check......................[    ]";
 	const char* vcInit64KernelArea =	"IA-32e Kernel Area Initialize..................[    ]";
 	const char* vcPageTableInitMsg =	"IA-32e Page Tables Initialize..................[    ]";
-	const char* vcCPUVendorIs =			"CPU Vendor: ";
+	const char* vcCPUVendorIs =			"Processor Vendor String........................[";
 	DWORD dwEAX, dwEBX, dwECX, dwEDX;
 	char* vcVendorString[13] = {0, };
 	DWORD cnt = 3;
@@ -44,6 +44,7 @@ void Main(void)
 	*((DWORD*)vcVendorString+2) = dwECX;
 	kPrintString(0, cnt, vcCPUVendorIs, WHITE);
 	kPrintString(strlen(vcCPUVendorIs), cnt, (const char*)vcVendorString, BOLD|RED);
+	kPrintString(strlen(vcCPUVendorIs) + strlen((const char*)vcVendorString), cnt, "]", WHITE);
 	cnt++;
 
 	// CPU의 IA-32 모드 지원 여부 체크
