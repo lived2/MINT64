@@ -241,7 +241,7 @@ static KEYMAPPINGENTRY gs_vstKeyMappingTable[KEY_MAPPINGTABLEMAXCOUNT] =
 	/* 20 */	{ 't'			, 'T'			},
 	/* 21 */	{ 'y'			, 'Y'			},
 	/* 22 */	{ 'u'			, 'U'			},
-	/* 23 */	{ 'u'			, 'U'			},
+	/* 23 */	{ 'i'			, 'I'			},
 	/* 24 */	{ 'o'			, 'O'			},
 	/* 25 */	{ 'p'			, 'P'			},
 	/* 26 */	{ '['			, '{'			},
