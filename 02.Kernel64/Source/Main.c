@@ -1,4 +1,6 @@
 #include "Types.h"
+//#include "AssemblyUtility.h"
+#include "Descriptor.h"
 #include "Keyboard.h"
 
 void kPrintString(int iX, int iY, const char* pcString, BOOL attr);
@@ -11,13 +13,33 @@ void Main(void)
 	BYTE bFlags;
 	BYTE bTemp;
 	int i = 0;
-	const char* vcCKernel64StartMsg = 	"IA-32e C Language Kernel Started...............[    ]";
-	const char* vcKeyboardActivate = 	"Keyboard Activate..............................[    ]";
+	const char* vcCKernel64StartMsg =     "IA-32e C Language Kernel Started...............[    ]";
+	const char* vcGDTInitAndSwitchMsg =   "GDT Initialize And Switch For IA-32e Mode......[    ]";
+	const char* vcTSSSegmentLoadMsg =     "TSS Segment Load...............................[    ]";
+	const char* vcIDTInitMsg =            "IDT Initialize.................................[    ]";
+	const char* vcKeyboardActivate = 	  "Keyboard Activate..............................[    ]";
 	DWORD cnt = 10;
 
 	kPrintString(0, cnt++, "Switch To IA-32e Mode Success~!!", WHITE);
 	kPrintString(0, cnt, vcCKernel64StartMsg, WHITE);
 	kPrintString(strlen(vcCKernel64StartMsg)-5, cnt, "Pass", BOLD|GREEN);
+	cnt++;
+
+	kPrintString(0, cnt, vcGDTInitAndSwitchMsg, WHITE);
+	kPrintString(strlen(vcGDTInitAndSwitchMsg)-5, cnt, "Pass", BOLD|GREEN);
+    kInitializeGDTTableAndTSS();
+    kLoadGDTR(GDTR_STARTADDRESS);
+	cnt++;
+
+	kPrintString(0, cnt, vcTSSSegmentLoadMsg, WHITE);
+	kPrintString(strlen(vcTSSSegmentLoadMsg)-5, cnt, "Pass", BOLD|GREEN);
+    kLoadTR(GDT_TSSSEGMENT);
+	cnt++;
+
+	kPrintString(0, cnt, vcIDTInitMsg, WHITE);
+	kPrintString(strlen(vcIDTInitMsg)-5, cnt, "Pass", BOLD|GREEN);
+    kInitializeIDTTables();
+    kLoadIDTR(IDTR_STARTADDRESS);
 	cnt++;
 
 	kPrintString(0, cnt, vcKeyboardActivate, WHITE);
@@ -47,6 +69,14 @@ void Main(void)
 					}
 					else
 						kPrintString(i++, cnt, vcTemp, WHITE);
+                    // 0이 입력되면 변수를 0으로 나누어 Divide Error 예외(벡터 0번)를
+                    // 발생시킴
+                    if (vcTemp[0] == '0')
+                    {
+                        // 아래 코드를 수행하면 Divide Error 예외가 발생하여
+                        // 커널의 임시 핸들러가 수행됨
+                        bTemp = bTemp / 0;
+                    }
 				}
 			}
 		}
