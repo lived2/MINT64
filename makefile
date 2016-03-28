@@ -38,7 +38,7 @@ Disk.img: 00.BootLoader/BootLoader.bin 01.Kernel32/Kernel32.bin 02.Kernel64/Kern
 	@echo ================= Disk.img Build Start ================= 
 	@echo
 
-	./ImageMaker.exe $^
+	./ImageMaker $^
 
 	@echo
 	@echo ================= All Build Complete ================= 
@@ -63,4 +63,4 @@ clean:
 	rm -f Disk.img
 
 run: Disk.img
-	qemu-system-x86_64.exe -m 64 -fda ./Disk.img -localtime -M pc
+	qemu-system-x86_64 -m 64 -fda ./Disk.img -localtime -M pc

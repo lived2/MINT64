@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
-#include <io.h>
+#include <sys/io.h> // for linux
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
@@ -32,8 +32,8 @@ int main(int argc, char* argv[])
 	}
 
 	// Disk.img 파일을 생성
-	if ((iTargetFd = open("Disk.img", O_RDWR|O_CREAT|O_TRUNC|
-					O_BINARY, S_IREAD|S_IWRITE)) == -1) {
+	if ((iTargetFd = open("Disk.img", O_RDWR|O_CREAT|O_TRUNC
+					/*|O_BINARY*/, S_IREAD|S_IWRITE)) == -1) {
 		fprintf(stderr, "[ERROR] Disk.img open fail.\n");
 		exit(-1);
 	}
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 	// 부트 로더 파일을 열어서
 	//---------------------------------------------------------------------------
 	printf("[INFO] Copy boot loader to image file\n");
-	if ((iSourceFd = open(argv[1], O_RDONLY|O_BINARY)) == -1) {
+	if ((iSourceFd = open(argv[1], O_RDONLY/*|O_BINARY*/)) == -1) {
 		fprintf(stderr, "[ERROR] %s open fail\n", argv[1]);
 		exit(-1);
 	}
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 	// 32비트 커널 파일을 열어서 모든 내용을 디스크 이미지 파일로 복사
 	//---------------------------------------------------------------------------
 	printf("[INFO] Copy protected mode kernel to image file\n");
-	if ((iSourceFd = open(argv[2], O_RDONLY|O_BINARY)) == -1) {
+	if ((iSourceFd = open(argv[2], O_RDONLY/*|O_BINARY*/)) == -1) {
 		fprintf(stderr, "[ERROR] %s open fail\n", argv[2]);
 		exit(-1);
 	}
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 	// 64비트 커널 파일을 열어서 모든 내용을 디스크 이미지 파일로 복사
 	//---------------------------------------------------------------------------
 	printf("[INFO] Copy IA-32e mode kernel to image file\n");
-	if ((iSourceFd = open(argv[3], O_RDONLY|O_BINARY)) == -1) {
+	if ((iSourceFd = open(argv[3], O_RDONLY/*|O_BINARY*/)) == -1) {
 		fprintf(stderr, "[ERROR] %s open fail\n", argv[3]);
 		exit(-1);
 	}

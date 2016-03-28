@@ -6,7 +6,7 @@ ImageMaker:
 	@echo
 
 	make -C 00.ImageMaker
-	cp 00.ImageMaker/ImageMaker.exe ..
+	cp 00.ImageMaker/ImageMaker ..
 
 	@echo
 	@echo ================= Build Complete ================= 
@@ -14,4 +14,4 @@ ImageMaker:
 
 clean:
 	make -C 00.ImageMaker clean
-	rm ../ImageMaker.exe
+	rm ../ImageMaker
