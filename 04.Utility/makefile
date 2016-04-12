@@ -14,4 +14,4 @@ ImageMaker:
 
 clean:
 	make -C 00.ImageMaker clean
-	rm ../ImageMaker
+	rm -f ../ImageMaker
